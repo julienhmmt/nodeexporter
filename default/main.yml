@@ -1,2 +1,6 @@
 ---
 # file: default/main.yml
+
+node_exporter_group: "node_exporter"
+node_exporter_release: "linux-amd64"
+node_exporter_user: "node_exporter"
