@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Julien HOMMET
+  description: Ansible template
+  license: GPLv3
+  min_ansible_version: "2.9"
+  namespace: homelab
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+    - name: Ubuntu
+      versions:
+        - bionic
+  role_name: nodeexporter
+dependencies:
+  []
