@@ -1,0 +1,29 @@
+# {{ ansible_managed }}
+
+[Unit]
+After=network-online.target
+Description=Node_Exporter Daemon
+Documentation=https://prometheus.io/docs/guides/node-exporter/
+
+[Service]
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}/node_exporter
+Group={{ node_exporter_group }}
+Restart=on-failure
+SyslogIdentifier=node_exporter
+Type=simple
+User={{ node_exporter_user }}
+
+## hardening
+# more info at https://gist.github.com/ageis/f5595e59b1cddb1513d1b425a323db04 & https://www.freedesktop.org/software/systemd/man/systemd.exec.html
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictNamespaces=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target

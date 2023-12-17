@@ -1,2 +1,11 @@
 ---
 # file: handlers/main.yml
+
+- name: Restart NodeExporter
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    enabled: true
+    masked: false
+    name: node_exporter
+    scope: system
+    state: restarted
