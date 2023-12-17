@@ -1,0 +1,17 @@
+---
+# file: nodeexporter/molecule/default/converge.yml
+
+- name: Converge
+  hosts: all
+  gather_facts: true
+  vars:
+    node_exporter_group: "node_exporter"
+    node_exporter_release: "linux-amd64"
+    node_exporter_sha256: "a550cd5c05f760b7934a2d0afad66d2e92e681482f5f57a917465b1fba3b02a6"
+    node_exporter_user: "node_exporter"
+    node_exporter_version: "1.7.0"
+  tasks:
+    - name: Include the nodeexporter role
+      ansible.builtin.include_role:
+        name: nodeexporter
+        tasks_from: main.yml

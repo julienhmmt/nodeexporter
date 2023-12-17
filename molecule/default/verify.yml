@@ -1,0 +1,24 @@
+---
+
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Test if services are started and enabled
+      ansible.builtin.systemd:
+        enabled: true
+        name: node_exporter
+        state: started
+      changed_when: false
+
+    - name: test uri
+      ansible.builtin.uri:
+        remote_src: true
+        url: http://localhost:9100/metrics
+        return_content: true
+      register: uri_result
+      changed_when: false
+      check_mode: false
+
+    - name: Show URI test results
+      ansible.builtin.debug:
+        msg: "{{ uri_result.content }}"
