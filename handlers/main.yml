@@ -6,6 +6,6 @@
     daemon_reload: true
     enabled: true
     masked: false
-    name: node-exporter
+    name: node_exporter
     scope: system
     state: restarted

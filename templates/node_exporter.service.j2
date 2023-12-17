@@ -1,4 +1,4 @@
-{{ ansible_managed }}
+# {{ ansible_managed }}
 
 [Unit]
 After=network-online.target
@@ -7,7 +7,7 @@ Documentation=https://prometheus.io/docs/guides/node-exporter/
 
 [Service]
 ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/usr/local/bin/node_exporter
+ExecStart=/usr/local/bin/node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}/node_exporter
 Group={{ node_exporter_group }}
 Restart=on-failure
 SyslogIdentifier=node_exporter
@@ -16,7 +16,6 @@ User={{ node_exporter_user }}
 
 ## hardening
 # more info at https://gist.github.com/ageis/f5595e59b1cddb1513d1b425a323db04 & https://www.freedesktop.org/software/systemd/man/systemd.exec.html
-MemoryDenyWriteExecute=true
 NoNewPrivileges=true
 PrivateDevices=true
 PrivateTmp=true

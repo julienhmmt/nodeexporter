@@ -1,18 +1,8 @@
 ---
 # file: tasks/main.yml
 
-- name: Create a user for Node Exporter
-  ansible.builtin.user:
-    comment: "used only for node_exporter"
-    create_home: false
-    force: false
-    generate_ssh_key: false
-    group: "{{ node_exporter_group }}"
-    name: "{{ node_exporter_user }}"
-    password: "*"
-    shell: "/bin/false"
-    state: present
-    system: true
+- name: Ping hosts
+  ansible.builtin.ping:
 
 - name: Create the Node Exporter group
   ansible.builtin.group:
@@ -20,37 +10,35 @@
     state: present
     system: true
 
-- name: Download Node Exporter archive with check (sha256)
-  ansible.builtin.get_url:
-    backup: false
-    checksum: sha256:{{ node_exporter_sha256 }}
-    decompress: true
-    dest: /tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}.tar.gz
-    http_agent: ansible-httpget
-    mode: u=rwx,g=rx,o=rx
-    owner: string
-    timeout: 10
-    url: >
-      https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/
-      node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}.tar.gz
-    validate_certs: true
-  register: node_exporter_source
-
-- name: Copy Node Exporter binary to system
-  ansible.builtin.copy:
-    backup: true
-    dest: "/usr/local/bin/{{ item }}"
+- name: Create a user for Node Exporter
+  ansible.builtin.user:
+    name: "{{ node_exporter_user }}"
     group: "{{ node_exporter_group }}"
+    system: true
+    shell: "/bin/false"
+    state: present
+
+- name: Download Node Exporter
+  ansible.builtin.get_url:
+    checksum: "sha256:{{ node_exporter_sha256 }}"
+    dest: "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}.tar.gz"
     mode: u=rwx,g=rx,o=rx
     owner: "{{ node_exporter_user }}"
-    remote_src: true
-    src: "/tmp/{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}/node_exporter"
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}.tar.gz"
+  check_mode: false
 
-- name: Installing the systemd unit file
+- name: Unarchive Node Exporter
+  ansible.builtin.unarchive:
+    dest: /usr/local/bin
+    owner: "{{ node_exporter_user }}"
+    remote_src: true
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_release }}.tar.gz"
+
+- name: Install systemd service for Node Exporter
   ansible.builtin.template:
-    dest: "/lib/systemd/system/node_exporter.service"
-    group: "{{ node_exporter_group }}"
+    dest: /lib/systemd/system/node_exporter.service
+    group: root
     mode: u=rw,g=r,o=r
-    owner: "node_exporter"
-    src: "node_exporter.service.j2"
+    owner: root
+    src: node_exporter.service.j2
   notify: Restart NodeExporter
